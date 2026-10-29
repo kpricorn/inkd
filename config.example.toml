@@ -1,0 +1,30 @@
+# inkd configuration. Copy to config/inkd.toml and adjust.
+
+[remarkable]
+rmapi = "rmapi"
+root = "/"                      # tablet folder to sync (everything below it)
+exclude = ["/trash"]            # tablet folders to skip
+inbox_folder = "/Inbox"         # where files from the cloud inbox land on the tablet
+obsidian_folder = "/Obsidian"   # where notes published from Obsidian land on the tablet
+
+[storage]
+# Any rclone remote: "dropbox:…", "gdrive:…", "onedrive:…". Empty disables it.
+remote = "dropbox:reMarkable/Tablet"   # rendered PDFs, mirroring the tablet's folders
+inbox = "dropbox:reMarkable/To Tablet" # drop PDF/EPUB here to send them to the tablet
+rclone = "rclone"
+
+[obsidian]
+vault = "/vault"                # empty disables Obsidian
+notes_dir = "reMarkable"        # notes made from tablet notebooks
+attachments_dir = "reMarkable/_pages"
+publish_key = "remarkable"      # notes with `remarkable: true` in the frontmatter go to the tablet
+
+[ocr]
+backend = "claude"              # "claude" (needs ANTHROPIC_API_KEY) or "none"
+model = "claude-opus-5-5"
+effort = "medium"
+instructions = ""               # e.g. "Notes are in German and English."
+
+[sync]
+interval = 300                  # seconds between cycles for `inkd watch`
+data_dir = "/data"

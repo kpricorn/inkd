@@ -1,0 +1,31 @@
+# rmfakecloud (the tablet's cloud) and inkd (the bridge) on one host.
+# See README.md for the one-time setup of the tablet, rmapi and rclone.
+services:
+  rmfakecloud:
+    image: ddvk/rmfakecloud:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Public URL the tablet uses to reach this server.
+      STORAGE_URL: ${RMFAKECLOUD_URL:?set RMFAKECLOUD_URL in .env}
+      JWT_SECRET_KEY: ${RMFAKECLOUD_JWT_SECRET:?set RMFAKECLOUD_JWT_SECRET in .env}
+      # Optional: MyScript keys for "Convert to text" on the tablet itself.
+      RMAPI_HWR_APPLICATIONKEY: ${MYSCRIPT_APPLICATION_KEY:-}
+      RMAPI_HWR_HMAC: ${MYSCRIPT_HMAC_KEY:-}
+    volumes:
+      - ./data/rmfakecloud:/data
+
+  inkd:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - rmfakecloud
+    environment:
+      RMAPI_HOST: http://rmfakecloud:3000
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./config:/config
+      - ./data/inkd:/data
+      # The Obsidian vault, e.g. inside the Dropbox or Google Drive folder synced to this host.
+      - ${VAULT_PATH:?set VAULT_PATH in .env}:/vault
